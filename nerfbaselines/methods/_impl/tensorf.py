@@ -92,6 +92,7 @@ def apply_transform(poses, transform):
     return poses
 
 
+white_bg_datasets = ["blender", "scannerf"]
 class TensoRFDataset:
     def __init__(self, dataset: Dataset, transform=None, is_stack=False):
         self.is_stack = is_stack
@@ -101,7 +102,7 @@ class TensoRFDataset:
 
         self.transform = np.eye(4)
 
-        if dataset.metadata.get("name") == "blender":
+        if dataset.metadata.get("name") in white_bg_datasets:
             self.white_bg = True
             self.near_far = [2.0, 6.0]
         elif dataset.metadata.get("name") == "llff":

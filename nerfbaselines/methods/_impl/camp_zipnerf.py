@@ -92,7 +92,7 @@ def get_transform_and_scale(transform):
     transform[:3, :] /= scale
     return transform, scale
 
-
+white_bg_datasets = ["blender", "scannerf"]
 class MNDataset(datasets.Dataset):
     def __init__(self, dataset: Dataset, config, split, dataparser_transform=None, verbose=True):
         self.split = split
@@ -129,7 +129,7 @@ class MNDataset(datasets.Dataset):
         images = []
         for img in self.dataset.images:
             img = img.astype(np.float32) / 255.0
-            if self.dataset.metadata.get("name") == "blender" and img.shape[-1] == 4:
+            if self.dataset.metadata.get("name") in white_bg_datasets and img.shape[-1] == 4:
                 # Blend with white background.
                 img = img[..., :3] * img[..., 3:] + (1 - img[..., 3:])
             images.append(img)
@@ -148,7 +148,7 @@ class MNDataset(datasets.Dataset):
             transform, scale = get_transform_and_scale(self.colmap_to_world_transform)
             poses = unpad_poses(transform @ pad_poses(poses))
             poses[:, :3, 3] *= scale
-        elif self.dataset.metadata.get("name") == "blender":
+        elif self.dataset.metadata.get("name") in white_bg_datasets:
             self.dataparser_transform = (None, np.eye(4))
             meters_per_colmap = self.dataparser_transform[0]
         elif self.dataparser_transform is None:
@@ -300,7 +300,7 @@ class CamP_ZipNeRF(Method):
         gin.config._FILE_READERS = gin.config._FILE_READERS[:1]
         if self.checkpoint is None:
             config_path = "configs/zipnerf/360.gin"
-            if dataset_name == "blender":
+            if dataset_name in white_bg_datasets:
                 config_path = "configs/zipnerf/blender.gin"
             gin.parse_config_file(config_path, skip_unknown=True)
             if self.camp:

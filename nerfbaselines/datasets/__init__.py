@@ -14,6 +14,7 @@ SUPPORTED_DATASETS = [
     "blender",
     "llff",
     "colmap",
+    "scannerf",
 ]
 
 

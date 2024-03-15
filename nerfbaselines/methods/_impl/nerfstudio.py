@@ -130,7 +130,7 @@ class _CustomDataParser(DataParser):
 
         # in x,y,z order
         # assumes that the scene is centered at the origin
-        if self.dataset.metadata.get("name") == "blender":
+        if self.dataset.metadata.get("name") == white_bg_datasets:
             aabb_scale = 1.5
             self.method.dataparser_params = dict(dataparser_transform=torch.eye(4, dtype=torch.float32), dataparser_scale=1.0, aabb_scale=1.5, num_images=len(image_names))
         else:
@@ -186,6 +186,7 @@ class _CustomDataParser(DataParser):
         )  # pylint: disable=protected-access
 
 
+white_bg_datasets = ["blender", "scannerf"]
 class NerfStudio(Method):
     nerfstudio_name: Optional[str] = None
     require_points3D: bool = False
@@ -222,17 +223,18 @@ class NerfStudio(Method):
         # See https://github.com/nerfstudio-project/nerfstudio/tree/SIGGRAPH-2023-Code
         # NOTE: we change the average_init_density!!
         use_original_average_init_density = False
-        if dataset.metadata.get("name") == "blender":
+        if dataset.metadata.get("name") in white_bg_datasets:
+            print("Applying config patch for dataset type blender")
             logging.info("Applying config patch for dataset type blender")
-            if not _config_safe_set(config, "pipeline.model.near_plane", 2.0):
+            if not _config_safe_set(config, "pipeline.model.near_plane", 0.05):
                 logging.warning("Flag pipeline.model.near_plane is not set (required for blender-type dataset)")
-            if not _config_safe_set(config, "pipeline.model.far_plane", 6.0):
+            if not _config_safe_set(config, "pipeline.model.far_plane", 10.0):
                 logging.warning("Flag pipeline.model.far_plane is not set (required for blender-type dataset)")
             if not _config_safe_set(config, "pipeline.datamanager.camera_optimizer.mode", "off") and not _config_safe_set(config, "pipeline.model.camera_optimizer.mode", "off"):
                 logging.warning("Flag pipeline.datamanager.camera_optimizer.mode is not set (required for blender-type dataset)")
             if not _config_safe_set(config, "pipeline.model.use_appearance_embedding", False):
                 logging.warning("Flag pipeline.model.use_appearance_embedding is not set (required for mipnerf360-type dataset)")
-            if not _config_safe_set(config, "pipeline.model.background_color", "white"):
+            if not _config_safe_set(config, "pipeline.model.background_color", "random"):
                 logging.warning("Flag pipeline.model.background_color is not set (required for blender-type dataset)")
             if not _config_safe_set(config, "pipeline.model.proposal_initial_sampler", "uniform"):
                 logging.warning("Flag pipeline.model.proposal_initial_sampler is not set (required for blender-type dataset)")
@@ -240,7 +242,7 @@ class NerfStudio(Method):
                 logging.warning("Flag pipeline.model.distortion_loss_mult is not set (required for blender-type dataset)")
             if not _config_safe_set(config, "pipeline.model.disable_scene_contraction", True):
                 logging.warning("Flag pipeline.model.disable_scene_contraction is not set (required for blender-type dataset)")
-            if not _config_safe_set(config, "pipeline.model.average_init_density", 1.0):
+            if not _config_safe_set(config, "pipeline.model.average_init_density", 1.5):
                 logging.warning("Flag pipeline.model.average_init_density is not set (required for blender-type dataset)")
 
         if dataset.metadata.get("name") == "mipnerf360":

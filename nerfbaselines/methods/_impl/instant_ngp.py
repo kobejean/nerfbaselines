@@ -158,6 +158,7 @@ def get_transforms(dataset: Dataset, dataparser_transform=None, dataparser_scale
     return out, dict(dataparser_transform=dataparser_transform, dataparser_scale=dataparser_scale, aabb_scale=aabb_scale, keep_coords=keep_coords, **kwargs)
 
 
+white_bg_datasets = ["blender", "scannerf"]
 class InstantNGP(Method):
     def __init__(self, checkpoint: Optional[Path] = None, **kwargs):
         super().__init__(**kwargs)
@@ -279,7 +280,7 @@ class InstantNGP(Method):
         else:
             loader = train_dataset.metadata.get("name")
             nerf_compatibility = False
-            if loader == "blender":
+            if loader in white_bg_datasets
                 aabb_scale = None
                 keep_coords = True
                 nerf_compatibility = True

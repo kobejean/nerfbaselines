@@ -113,6 +113,7 @@ def _load_cam(pose, intrinsics, camera_id, image_name, image_size, device=None):
     return cam
 
 
+white_bg_datasets = ["blender", "scannerf"]
 def _convert_dataset_to_gaussian_splatting(dataset: Optional[Dataset], tempdir: str, white_background: bool = False):
     if dataset is None:
         return SceneInfo(None, [], [], nerf_normalization=dict(radius=None), ply_path=None)
@@ -142,7 +143,7 @@ def _convert_dataset_to_gaussian_splatting(dataset: Optional[Dataset], tempdir: 
         w, h = dataset.cameras.image_sizes[idx]
         im_data = dataset.images[idx][:h, :w]
         assert im_data.dtype == np.uint8, "Gaussian Splatting supports images as uint8"
-        if dataset.metadata.get("name", None) == "blender":
+        if dataset.metadata.get("name", None) in white_bg_datasets:
             assert white_background, "white_background must be set for blender scenes"
             assert im_data.shape[-1] == 4
             bg = np.array([1, 1, 1])
@@ -222,7 +223,7 @@ class GaussianSplatting(Method):
         safe_state(True)
 
         if self.checkpoint is None:
-            if train_dataset.metadata.get("name") == "blender":
+            if train_dataset.metadata.get("name") in white_bg_datasets:
                 # Blender scenes have white background
                 self._args_list.append("--white_background")
                 logging.info("overriding default background color to white for blender dataset")
@@ -247,7 +248,7 @@ class GaussianSplatting(Method):
 
         if self.checkpoint is None:
             # Verify parameters are set correctly
-            if train_dataset.metadata.get("name") == "blender":
+            if train_dataset.metadata.get("name") in white_bg_datasets:
                 assert self.dataset.white_background, "white_background should be True for blender dataset"
 
         # Setup model
