@@ -44,7 +44,7 @@ def load_scannerf_dataset(path: Path, split: str, **kwargs):
     w = int(meta["w"])
     h = int(meta["h"])
     image_sizes = np.array([w, h], dtype=np.int32)[None].repeat(len(cams), axis=0)
-    nears_fars = np.array([0.05, 10.0], dtype=np.float32)[None].repeat(len(cams), axis=0)
+    nears_fars = np.array([0.5, 8.0], dtype=np.float32)[None].repeat(len(cams), axis=0)
     fx = float(meta["fl_x"])
     fy = float(meta["fl_y"])
     cx = float(meta["cx"])

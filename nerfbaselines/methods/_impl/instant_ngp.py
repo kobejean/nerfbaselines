@@ -280,7 +280,7 @@ class InstantNGP(Method):
         else:
             loader = train_dataset.metadata.get("name")
             nerf_compatibility = False
-            if loader in white_bg_datasets
+            if loader in white_bg_datasets:
                 aabb_scale = None
                 keep_coords = True
                 nerf_compatibility = True
