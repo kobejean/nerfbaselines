@@ -27,7 +27,7 @@ import torch
 from random import randint
 
 from utils.general_utils import PILtoTorch
-from arguments import ModelParams, PipelineParams, OptimizationParams # noqa: E402
+from mip_splatting_arguments import ModelParams, PipelineParams, OptimizationParams # noqa: E402
 from gaussian_renderer import render # noqa: E402
 from scene import GaussianModel # noqa: E402
 from scene.cameras import Camera  # noqa: E402
