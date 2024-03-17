@@ -99,6 +99,16 @@ class Dataset:
 
         dataset_load_features(self, required_features, supported_camera_models)
         return self
+    
+    @mark_host
+    def redistort_features(self, required_features, supported_camera_models=None):
+        # Import lazily here because the Dataset class
+        # may be used in places where some of the dependencies
+        # are not available.
+        from .datasets._common import dataset_redistort_features
+
+        dataset_redistort_features(self, required_features, supported_camera_models)
+        return self
 
     @property
     def expected_scene_scale(self):
